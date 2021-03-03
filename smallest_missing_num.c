@@ -31,6 +31,10 @@ Expected Auxiliary Space: O(1).
 Constraints:
 1 <= N <= 106
 -106 <= arr[i] <= 106
+
+Referrence:
+1] https://www.youtube.com/watch?v=-lfHWWMmXXM
+2] https://www.youtube.com/watch?v=9SnkdYXNIzM
 *******************************************************************************/
 
 #include <stdio.h>
