@@ -1,145 +1,190 @@
-/******************************************************************************
-
-Welcome to GDB Online.
-GDB online is an online compiler and debugger tool for C, C++, Python, PHP, Ruby,
-C#, VB, Perl, Swift, Prolog, Javascript, Pascal, HTML, CSS, JS
-Code, Compile, Run and Debug online from anywhere in world.
-
-*******************************************************************************/
 #include <stdio.h>
-#define ADD_NODE 1
-#define DEL_NODE 2
-#define PRINT 3
-#define MAX 5
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
 
-int head = -1;
-int tail = -1;
-int c_queue[MAX] = {};
+/** Options for User */
+#define INIT    (0u)
+#define ENQ     (1u)
+#define DEQ     (2u)
+#define DEL     (3u)
+#define PRINT   (4u)
+#define EXIT    (5u)
 
-int queue_empty()
+/** Structure to hold queue elements */
+typedef struct
 {
-    return((head == -1) && (tail == -1));
-}
-int queue_full()
-{
-    if(tail > head)
-    {
-        if(tail-head == MAX-1)
-            return 1;
-        else
-            return 0;
-    }
-    else
-    {
-        if(head-tail == 1)
-            return 1;
-        else
-            return 0;
-    }
-}
+    uint32_t *buffer;    /** Queue Buffer */
+    uint8_t head;        /** Queue Front */
+    uint8_t tail;        /** Queue Rear */
+    uint8_t count;       /** Queue Current Count */
+    uint8_t max_count;   /** Queue Max Count */
+} c_queue;
 
-void print()
+c_queue* init_cqueue(uint8_t size)
 {
-    if(queue_empty())
+    c_queue* temp_queue = NULL;
+    if (size != 0)
     {
-        printf("Queue is empty bro!\n");
-        return;
-    }
-    int i = head;
-    while(i != tail)
-    {
-        printf("%d ",c_queue[i]);
-        i++;
-        if(i == MAX)
+        uint32_t* temp          = (uint32_t*)malloc(size * sizeof(int));
+        temp_queue              = (c_queue*)malloc(sizeof(c_queue));
+        if ((temp != NULL) && (temp_queue != NULL))
         {
-            i = 0;
+            temp_queue->head        = 0u;
+            temp_queue->tail        = 0u;
+            temp_queue->max_count   = size;
+            temp_queue->count       = 0u;
+            temp_queue->buffer      = temp;
         }
     }
-    printf("%d \n",c_queue[i]);
+    return temp_queue;
 }
 
-void add_node()
+
+bool delete_queue(c_queue* q_addr)
 {
-    if(queue_full())
-    {
-        printf("Queue full bro!\n");
-        return;
-    }
-    int num;
-    printf("Enter number to be added : ");
-    scanf("%d",&num);
+    bool ret = false;
 
-    if(queue_empty())
+    if (q_addr != NULL)
     {
-        /*if queue was empty
-        take necessary care while adding first node
-        indicating there is only one node
-        */
-        printf("Since queue is empty adding to first node\n");
-        head = tail = 0;
-        c_queue[tail] = num;
-        return;
+        free(q_addr->buffer);
+        free(q_addr);
+        ret = true;
     }
-    if(tail == MAX-1)
-        tail = 0;
-    else
-        tail++;
-    c_queue[tail] = num;
+    
+    return ret;
 }
 
-void delete_node()
+bool isFull(c_queue* q_addr)
 {
-    if(queue_empty())
-    {
-        printf("Queue empty bro!\n");
-        return;
-    }
-    c_queue[head] = 0;
-
-    /* you had only one node which is shown with
-    head = tail
-    and you had deled that node too!
-    which means queue is empty now!
-    hence marking
-    head = tail = -1
-    */
-    if (head == tail)
-    {
-        head = tail = -1;
-        return;
-    }
-    if(head == MAX-1)
-        head = 0;
-    else
-        head++;
+    return ((q_addr->count == q_addr->max_count) ? true : false);
 }
 
+bool isEmpty(c_queue* q_addr)
+{
+    return (q_addr->count == 0u ? true : false);
+}
+
+bool enqueue(c_queue* q_addr, int data)
+{
+    bool ret = false;
+
+    if (!isFull(q_addr))
+    {
+        q_addr->buffer[q_addr->tail] = data;
+        q_addr->tail = ((q_addr->tail + 1) == q_addr->max_count) ? 0u : (q_addr->tail + 1);
+        q_addr->count++;
+        ret = true;
+    }
+
+    return ret;
+}
+
+bool dequeue(c_queue* q_addr, int* data)
+{
+    bool ret = false;
+
+    if (!isEmpty(q_addr) && (data != NULL))
+    {
+        *data = q_addr->buffer[q_addr->head];
+        q_addr->buffer[q_addr->head] = 0u;
+        q_addr->head = ((q_addr->head + 1) == q_addr->max_count) ? 0u : (q_addr->head + 1);
+        q_addr->count--;
+        ret = true;
+    }
+
+    return ret;
+}
+
+void print_queue(c_queue* q_addr)
+{
+    uint8_t i = 0u;
+    
+    printf("Printing Queue 0 to Max\n[");
+    for (; i < q_addr->max_count ; i++)
+    {
+        printf(" %d " ,q_addr->buffer[i]);
+    }
+    printf("]\n");
+}
 
 int main()
 {
-    int choice;
-    printf("Hello World!\n");
-    while(1)
+    uint32_t option         = 0u;
+    c_queue *temp_queue     = NULL;
+
+    while(option != EXIT)
     {
-        printf("Enter choice: 1 - add\t2 - delete\t3 - print\t any - exit : ");
-        scanf("%d",&choice);
-        switch(choice)
+        printf("Enter option 0.INIT 1.ENQ 2.DEQ 3.DEL 4.PRINT 5.EXIT \n");
+        scanf(" %d", &option);
+        switch(option)
         {
-            case ADD_NODE:
-                add_node();
+            case INIT:
+            {
+                uint32_t size = 0u;
+                printf("Enter the size of queue = ");
+                scanf(" %d", &size);
+                temp_queue = init_cqueue(size);
+                if (temp_queue == NULL)
+                {
+                    printf("INIT_QUEUE operation failed!\n");
+                }
                 break;
-            case DEL_NODE:
-                delete_node();
+            }
+            
+            case ENQ:
+            {
+                uint32_t data = 0u;
+                printf("Enter the number you want to add = ");
+                scanf(" %d", &data);
+                if (!enqueue(temp_queue, data))
+                {
+                    printf("ENQUEUE operation failed\n");
+                }
+                else
+                {
+                    printf("ENQUEUE success! data = %d added\n", data);
+                }
+                break;                
+            }
+
+            case DEQ:
+            {
+                uint32_t data = 0u;
+                if (!dequeue(temp_queue, &data))
+                {
+                    printf("DEQUEUE operation failed\n");
+                }
+                else
+                {
+                    printf("DEQUEUE success! data = %d\n", data);
+                }
                 break;
+            }
+
+            case DEL:
+            {
+                if (!delete_queue(temp_queue))
+                {
+                    printf("DEL_QUEUE operation failed\n");
+                }
+                break;                
+            }
+            
             case PRINT:
-                print();
-                break;
-            default:
-                goto out;
-                break;
+            {
+                print_queue(temp_queue);
+                break;         
+            }
+
+            case EXIT:
+            {
+                printf("Bye Bye ! \n");
+                break;                
+            }
+
         }
     }
-out:
-    printf("Bye bye!\n");
+
     return 0;
 }
