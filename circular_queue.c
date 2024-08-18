@@ -3,7 +3,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-/** Options for User */
+/**
+ * Options for User
+*/
 #define INIT    (0u)
 #define ENQ     (1u)
 #define DEQ     (2u)
@@ -11,7 +13,10 @@
 #define PRINT   (4u)
 #define EXIT    (5u)
 
-/** Structure to hold queue elements */
+/**
+ * @brief Structure to hold Queue elements
+ * 
+ */
 typedef struct
 {
     uint32_t *buffer;    /** Queue Buffer */
@@ -21,6 +26,12 @@ typedef struct
     uint8_t max_count;   /** Queue Max Count */
 } c_queue;
 
+/**
+ * @brief Implements operation to initialize the queue
+ * 
+ * @param size      Size of the queue buffer elements
+ * @return c_queue* Pointer to queue NULL if failed 
+ */
 c_queue* init_cqueue(uint8_t size)
 {
     c_queue* temp_queue = NULL;
@@ -40,7 +51,13 @@ c_queue* init_cqueue(uint8_t size)
     return temp_queue;
 }
 
-
+/**
+ * @brief Deletes the queue
+ * 
+ * @param q_addr    Queue to be deleted
+ * @return true     If deleted successfully
+ * @return false    If failed to delete
+ */
 bool delete_queue(c_queue* q_addr)
 {
     bool ret = false;
@@ -55,16 +72,38 @@ bool delete_queue(c_queue* q_addr)
     return ret;
 }
 
+/**
+ * @brief Checks if queue is full
+ * 
+ * @param q_addr    Address of the queue to be checked
+ * @return true     Queue is full
+ * @return false    Queue is not full
+ */
 bool isFull(c_queue* q_addr)
 {
     return ((q_addr->count == q_addr->max_count) ? true : false);
 }
 
+/**
+ * @brief Checks if queue is empty
+ * 
+ * @param q_addr    Address of the queue to be checked
+ * @return true     Queue is empty
+ * @return false    Queue is not empty
+ */
 bool isEmpty(c_queue* q_addr)
 {
     return (q_addr->count == 0u ? true : false);
 }
 
+/**
+ * @brief Adds element to the queue buffer
+ * 
+ * @param q_addr    queue address to be enqueued
+ * @param data      data to be enqueued
+ * @return true     data enqueued successfully
+ * @return false    failed to enqueue data
+ */
 bool enqueue(c_queue* q_addr, int data)
 {
     bool ret = false;
@@ -80,6 +119,14 @@ bool enqueue(c_queue* q_addr, int data)
     return ret;
 }
 
+/**
+ * @brief Removes element from the queue buffer
+ * 
+ * @param q_addr    queue address to be dequeued
+ * @param data      data to be filled in after dequeue operation
+ * @return true     data dequeued successfully
+ * @return false    failed to dequeue data
+ */
 bool dequeue(c_queue* q_addr, int* data)
 {
     bool ret = false;
@@ -96,6 +143,11 @@ bool dequeue(c_queue* q_addr, int* data)
     return ret;
 }
 
+/**
+ * @brief Prints the content of the queue buffer
+ * 
+ * @param q_addr 
+ */
 void print_queue(c_queue* q_addr)
 {
     uint8_t i = 0u;
@@ -115,7 +167,7 @@ int main()
 
     while(option != EXIT)
     {
-        printf("Enter option 0.INIT 1.ENQ 2.DEQ 3.DEL 4.PRINT 5.EXIT \n");
+        printf("Enter option [0.INIT 1.ENQ 2.DEQ 3.DEL 4.PRINT 5.EXIT] \n");
         scanf(" %d", &option);
         switch(option)
         {
@@ -177,7 +229,7 @@ int main()
                 break;         
             }
 
-            case EXIT:
+            default:
             {
                 printf("Bye Bye ! \n");
                 break;                
